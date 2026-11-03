@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard SPK - Metode AHP Penilaian Karyawan</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="h-full overflow-hidden text-gray-800">
+
+    <div class="flex h-screen overflow-hidden bg-gray-100">
+
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-slate-900 text-white flex flex-col justify-between hidden md:flex flex-shrink-0">
+            <div>
+                <!-- Brand Header -->
+                <div class="p-6 border-b border-slate-800 flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-white text-xl shadow-lg shadow-indigo-500/30">
+                        AHP
+                    </div>
+                    <div>
+                        <h1 class="text-base font-bold text-white leading-tight">SPK Karyawan</h1>
+                        <p class="text-xs text-indigo-400 font-medium">Metode AHP Interactive</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="mt-6 px-4 space-y-1.5">
+                    <a href="javascript:void(0)" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item flex items-center px-4 py-3 bg-indigo-600 text-white rounded-xl font-medium shadow-md shadow-indigo-600/20 transition">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 00-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        Dashboard & Ranking
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('input-nilai')" id="nav-input-nilai" class="nav-item flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 012.828 0L20.586 7.586a2 2 0 010 2.828L11.828 19H9v-2.828l8.586-8.586z"></path></svg>
+                        Input Nilai (12+ Karyawan)
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('matriks')" id="nav-matriks" class="nav-item flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        Bobot Kriteria AHP
+                    </a>
+                    <a href="javascript:void(0)" onclick="switchTab('panduan')" id="nav-panduan" class="nav-item flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl font-medium transition">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                        Panduan Penilaian
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Profile Info -->
+            <div class="p-4 m-4 bg-slate-800/60 rounded-xl border border-slate-700/50 flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center font-bold text-white text-sm shadow">
+                    HR
+                </div>
+                <div class="overflow-hidden">
+                    <p class="text-xs font-semibold text-white truncate">Tim HRD Manager</p>
+                    <p class="text-[10px] text-slate-400 truncate">hrd@company.com</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <div class="flex-1 flex flex-col h-screen overflow-hidden">
+            
+            <!-- Top Header -->
+            <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center space-x-4">
+                    <h2 id="page-title" class="text-xl font-bold text-gray-800">Dashboard Evaluasi AHP</h2>
+                    <span class="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-semibold border border-indigo-100">Periode 2026</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="resetData()" class="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50 transition flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        <span>Reset Nilai</span>
+                    </button>
+                    <button onclick="window.print()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 transition shadow-sm shadow-indigo-200 flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        <span>Cetak Laporan</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Scrollable Content -->
+            <main class="flex-1 overflow-y-auto p-6 space-y-6">
+
+                <!-- TAB 1: DASHBOARD UTAMA -->
+                <div id="tab-dashboard-content" class="space-y-6 tab-content">
+                    
+                    <!-- KPI Summary Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                        <!-- Top Employee Card -->
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                            <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-2xl">
+                                🏆
+                            </div>
+                            <div class="overflow-hidden">
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Terbaik Bulan Ini</p>
+                                <h3 id="kpi-best-employee" class="text-lg font-bold text-gray-900 truncate">Karyawan 1</h3>
+                                <p id="kpi-best-score" class="text-xs text-emerald-600 font-semibold mt-0.5">Skor Akhir: 88.5</p>
+                            </div>
+                        </div>
+
+                        <!-- Total Candidates -->
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                            <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xl">
+                                👥
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Karyawan</p>
+                                <h3 id="kpi-total-candidates" class="text-xl font-bold text-gray-900">12 Personel</h3>
+                                <p class="text-xs text-gray-500 mt-0.5">Penilaian Manual Aktif</p>
+                            </div>
+                        </div>
+
+                        <!-- Consistency Ratio Card -->
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                            <div id="kpi-cr-bg" class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-xl">
+                                📊
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Consistency Ratio (CR)</p>
+                                <h3 id="kpi-cr-val" class="text-lg font-bold text-gray-900">0.047 (4.7%)</h3>
+                                <span id="kpi-cr-badge" class="inline-block px-2 py-0.5 text-[10px] bg-emerald-100 text-emerald-800 rounded-md font-semibold">Valid (CR ≤ 10%)</span>
+                            </div>
+                        </div>
+
+                        <!-- Dominant Criteria -->
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                            <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xl">
+                                ⚡
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Kriteria Dominan</p>
+                                <h3 id="kpi-dominant-criteria" class="text-base font-bold text-gray-900 truncate max-w-[130px]">Kedisiplinan</h3>
+                                <p id="kpi-dominant-weight" class="text-xs text-purple-600 font-semibold mt-0.5">Bobot: 63.4%</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visualizations Section -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Bar Chart: Ranking -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="text-base font-bold text-gray-800">Peringkat Karyawan (Top 12)</h3>
+                                    <p class="text-xs text-gray-400">Diurutkan berdasarkan skor akhir terbobot AHP</p>
+                                </div>
+                                <span class="text-xs font-medium px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg">Realtime Sync</span>
+                            </div>
+                            <div class="h-72">
+                                <canvas id="rankingChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Doughnut Chart: Criteria Weights -->
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-base font-bold text-gray-800">Proporsi Bobot Kriteria</h3>
+                            </div>
+                            <div class="h-72 flex justify-center items-center">
+                                <canvas id="weightChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ranking & Detail Table -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <h3 class="text-base font-bold text-gray-800">Hasil Evaluasi & Peringkat Karyawan Terbaik</h3>
+                                <p class="text-xs text-gray-500">Skor Akhir = ∑ (Nilai Kriteria × Bobot Kriteria AHP)</p>
+                            </div>
+                            <button onclick="switchTab('input-nilai')" class="px-4 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-xl text-xs font-semibold transition">
+                                ✏️ Edit Nilai Karyawan
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left text-gray-600">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-100">
+                                    <tr>
+                                        <th class="px-6 py-4">Rank</th>
+                                        <th class="px-6 py-4">Nama Karyawan</th>
+                                        <th class="px-6 py-4 text-center">Kedisiplinan (K1)</th>
+                                        <th class="px-6 py-4 text-center">Kualitas Kerja (K2)</th>
+                                        <th class="px-6 py-4 text-center">Kerjasama Tim (K3)</th>
+                                        <th class="px-6 py-4 text-center">Inisiatif (K4)</th>
+                                        <th class="px-6 py-4 text-right">Skor Akhir AHP</th>
+                                        <th class="px-6 py-4 text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ranking-table-body">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- TAB 2: INPUT NILAI MANUAL (12+ KARYAWAN) -->
+                <div id="tab-input-nilai-content" class="space-y-6 tab-content hidden">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-100 gap-4">
+                            <div>
+                                <h3 class="text-base font-bold text-gray-800">Input & Edit Nilai Karyawan Manual</h3>
+                                <p class="text-xs text-gray-500">Masukkan nilai mentah karyawan (skala 0 - 100). Perubahan langsung memperbarui hasil AHP.</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="addNewEmployee()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold transition flex items-center space-x-1">
+                                    <span>+ Tambah Karyawan</span>
+                                </button>
+                                <button onclick="fillRandomScores()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition">
+                                    🎲 Acak Nilai Dummy
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Manual Input Table -->
+                        <div class="overflow-x-auto mt-4">
+                            <table class="w-full text-sm text-left text-gray-600">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-100">
+                                    <tr>
+                                        <th class="px-4 py-3 w-12">No</th>
+                                        <th class="px-4 py-3 min-w-[180px]">Nama Karyawan</th>
+                                        <th class="px-4 py-3 text-center min-w-[110px]">Kedisiplinan (K1)</th>
+                                        <th class="px-4 py-3 text-center min-w-[110px]">Kualitas (K2)</th>
+                                        <th class="px-4 py-3 text-center min-w-[110px]">Kerjasama (K3)</th>
+                                        <th class="px-4 py-3 text-center min-w-[110px]">Inisiatif (K4)</th>
+                                        <th class="px-4 py-3 text-center w-20">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="manual-input-table-body">
+                                    <!-- Dynamic Editable Input Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: MATRIKS KRITERIA (AHP) -->
+                <div id="tab-matriks-content" class="space-y-6 tab-content hidden">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <div class="pb-4 border-b border-gray-100 mb-6">
+                            <h3 class="text-base font-bold text-gray-800">Matriks Perbandingan Berpasangan (AHP Criteria Matrix)</h3>
+                            <p class="text-xs text-gray-500">Sesuaikan tingkat kepentingan antar kriteria (Skala Saaty 1-9) untuk menetapkan bobot hirarki AHP.</p>
+                        </div>
+
+                        <!-- Pairwise Comparison Sliders -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <!-- K1 vs K2 -->
+                            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200/80">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-xs font-bold text-gray-700">Kedisiplinan vs Kualitas Kerja</span>
+                                    <span id="val-k1-k2" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">3</span>
+                                </div>
+                                <input type="range" id="slider-k1-k2" min="1" max="9" value="3" step="1" oninput="updateMatrixFromSliders()" class="w-full accent-indigo-600 cursor-pointer">
+                                <div class="flex justify-between text-[10px] text-gray-400 mt-1">
+                                    <span>Sama Penting (1)</span>
+                                    <span>Mutlak Lebih (9)</span>
+                                </div>
+                            </div>
+
+                            <!-- K1 vs K3 -->
+                            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200/80">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-xs font-bold text-gray-700">Kedisiplinan vs Kerjasama Tim</span>
+                                    <span id="val-k1-k3" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">5</span>
+                                </div>
+                                <input type="range" id="slider-k1-k3" min="1" max="9" value="5" step="1" oninput="updateMatrixFromSliders()" class="w-full accent-indigo-600 cursor-pointer">
+                                <div class="flex justify-between text-[10px] text-gray-400 mt-1">
+                                    <span>Sama Penting (1)</span>
+                                    <span>Mutlak Lebih (9)</span>
+                                </div>
+                            </div>
+
+                            <!-- K1 vs K4 -->
+                            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200/80">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-xs font-bold text-gray-700">Kedisiplinan vs Inisiatif</span>
+                                    <span id="val-k1-k4" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">4</span>
+                                </div>
+                                <input type="range" id="slider-k1-k4" min="1" max="9" value="4" step="1" oninput="updateMatrixFromSliders()" class="w-full accent-indigo-600 cursor-pointer">
+                                <div class="flex justify-between text-[10px] text-gray-400 mt-1">
+                                    <span>Sama Penting (1)</span>
+                                    <span>Mutlak Lebih (9)</span>
+                                </div>
+                            </div>
+
+                            <!-- K2 vs K3 -->
+                            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200/80">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-xs font-bold text-gray-700">Kualitas Kerja vs Kerjasama Tim</span>
+                                    <span id="val-k2-k3" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">3</span>
+                                </div>
+                                <input type="range" id="slider-k2-k3" min="1" max="9" value="3" step="1" oninput="updateMatrixFromSliders()" class="w-full accent-indigo-600 cursor-pointer">
+                                <div class="flex justify-between text-[10px] text-gray-400 mt-1">
+                                    <span>Sama Penting (1)</span>
+                                    <span>Mutlak Lebih (9)</span>
+                                </div>
+                            </div>
+
+                            <!-- K2 vs K4 -->
+                            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200/80">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-xs font-bold text-gray-700">Kualitas Kerja vs Inisiatif</span>
+                                    <span id="val-k2-k4" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">2</span>
+                                </div>
+                                <input type="range" id="slider-k2-k4" min="1" max="9" value="2" step="1" oninput="updateMatrixFromSliders()" class="w-full accent-indigo-600 cursor-pointer">
+                                <div class="flex justify-between text-[10px] text-gray-400 mt-1">
+                                    <span>Sama Penting (1)</span>
+                                    <span>Mutlak Lebih (9)</span>
+                                </div>
+                            </div>
+
+                            <!-- K3 vs K4 -->
+                            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200/80">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-xs font-bold text-gray-700">Kerjasama Tim vs Inisiatif</span>
+                                    <span id="val-k3-k4" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">1</span>
+                                </div>
+                                <input type="range" id="slider-k3-k4" min="1" max="9" value="1" step="1" oninput="updateMatrixFromSliders()" class="w-full accent-indigo-600 cursor-pointer">
+                                <div class="flex justify-between text-[10px] text-gray-400 mt-1">
+                                    <span>Sama Penting (1)</span>
+                                    <span>Mutlak Lebih (9)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Computed Criteria Table -->
+                        <h4 class="text-sm font-bold text-gray-800 mb-3">Hasil Eigenvector & Bobot Kriteria</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left text-gray-600 border border-gray-100 rounded-xl">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3">Kode</th>
+                                        <th class="px-4 py-3">Nama Kriteria</th>
+                                        <th class="px-4 py-3 text-right">Eigenvector (Bobot)</th>
+                                        <th class="px-4 py-3 text-right">Persentase</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="criteria-weight-table-body">
+                                    <!-- Dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: PANDUAN PENILAIAN -->
+                <div id="tab-panduan-content" class="space-y-6 tab-content hidden">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800">Cara Menilai Karyawan Terbaik Bulan Ini dengan AHP</h3>
+                            <p class="text-xs text-gray-500 mt-1">Panduan langkah demi langkah menggunakan aplikasi SPK ini untuk evaluasi bulanan HRD.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="p-5 bg-indigo-50/50 rounded-2xl border border-indigo-100 flex items-start space-x-4">
+                                <div class="w-8 h-8 bg-indigo-600 text-white rounded-xl flex items-center justify-center font-bold text-sm shrink-0">1</div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-800">Tentukan Tingkat Kepentingan Kriteria</h4>
+                                    <p class="text-xs text-gray-600 mt-1">Masuk ke tab <b>"Bobot Kriteria AHP"</b>. Geser slider untuk menyesuaikan seberapa penting satu kriteria dibanding kriteria lainnya pada bulan ini.</p>
+                                </div>
+                            </div>
+
+                            <div class="p-5 bg-emerald-50/50 rounded-2xl border border-emerald-100 flex items-start space-x-4">
+                                <div class="w-8 h-8 bg-emerald-600 text-white rounded-xl flex items-center justify-center font-bold text-sm shrink-0">2</div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-800">Input Nilai Per Karyawan Bulan Ini</h4>
+                                    <p class="text-xs text-gray-600 mt-1">Masuk ke tab <b>"Input Nilai (12+ Karyawan)"</b>. Masukkan skor performa fisik/real karyawan untuk tiap kriteria dalam skala 0 sampai 100.</p>
+                                </div>
+                            </div>
+
+                            <div class="p-5 bg-amber-50/50 rounded-2xl border border-amber-100 flex items-start space-x-4">
+                                <div class="w-8 h-8 bg-amber-600 text-white rounded-xl flex items-center justify-center font-bold text-sm shrink-0">3</div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-800">Verifikasi Konsistensi Matrix (CR)</h4>
+                                    <p class="text-xs text-gray-600 mt-1">Pastikan nilai <b>Consistency Ratio (CR) ≤ 10% (0.1)</b>. Jika CR > 10%, berarti pembobotan kriteria kurang konsisten dan perlu disesuaikan kembali.</p>
+                                </div>
+                            </div>
+
+                            <div class="p-5 bg-purple-50/50 rounded-2xl border border-purple-100 flex items-start space-x-4">
+                                <div class="w-8 h-8 bg-purple-600 text-white rounded-xl flex items-center justify-center font-bold text-sm shrink-0">4</div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-800">Lihat Peringkat & Cetak Laporan</h4>
+                                    <p class="text-xs text-gray-600 mt-1">Buka tab <b>"Dashboard & Ranking"</b>. Peringkat 1 paling atas secara otomatis terpilih sebagai Karyawan Terbaik Bulan Ini.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Application Script Logic -->
+    <script>
+        // Criteria List (4 Kriteria)
+        const criteriaNames = ['Kedisiplinan (K1)', 'Kualitas Kerja (K2)', 'Kerjasama Tim (K3)', 'Inisiatif (K4)'];
+        
+        // Default 12 Sample Employees Data (Scores 0-100)
+        let employees = [
+            { id: 1, name: 'Budi Santoso', scores: [95, 88, 82, 90] },
+            { id: 2, name: 'Siti Rahma', scores: [88, 92, 85, 80] },
+            { id: 3, name: 'Ahmad Dahlan', scores: [80, 85, 90, 88] },
+            { id: 4, name: 'Dewi Lestari', scores: [92, 78, 80, 85] },
+            { id: 5, name: 'Eko Prasetyo', scores: [75, 88, 84, 82] },
+            { id: 6, name: 'Fajar Nugraha', scores: [85, 82, 88, 79] },
+            { id: 7, name: 'Gita Gutawa', scores: [90, 90, 75, 85] },
+            { id: 8, name: 'Hendra Wijaya', scores: [78, 80, 82, 88] },
+            { id: 9, name: 'Indah Permata', scores: [88, 85, 89, 91] },
+            { id: 10, name: 'Joko Widodo', scores: [82, 84, 86, 80] },
+            { id: 11, name: 'Kartika Putri', scores: [91, 89, 87, 85] },
+            { id: 12, name: 'Lukman Hakim', scores: [79, 81, 83, 80] }
+        ];
+
+        // Random Index (RI) table for AHP N=4
+        const RI_TABLE = { 1: 0.00, 2: 0.00, 3: 0.58, 4: 0.90, 5: 1.12 };
+
+        let rankingChartInstance = null;
+        let weightChartInstance = null;
+
+        window.onload = function () {
+            initCharts();
+            renderManualInputTable();
+            calculateAHP();
+        };
+
+        // Navigation Switch
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
+                el.classList.add('text-slate-400');
+            });
+            const activeNav = document.getElementById(`nav-${tabName}`);
+            if (activeNav) {
+                activeNav.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+                activeNav.classList.remove('text-slate-400');
+            }
+
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}-content`).classList.remove('hidden');
+
+            const titles = {
+                'dashboard': 'Dashboard & Ranking Karyawan Terbaik',
+                'input-nilai': 'Input & Edit Nilai Karyawan (12+ Personel)',
+                'matriks': 'Matriks Perbandingan Kriteria AHP',
+                'panduan': 'Panduan Evaluasi Penilaian Karyawan'
+            };
+            document.getElementById('page-title').innerText = titles[tabName] || 'Dashboard SPK AHP';
+        }
+
+        // Render Manual Input Table
+        function renderManualInputTable() {
+            const tbody = document.getElementById('manual-input-table-body');
+            tbody.innerHTML = '';
+
+            employees.forEach((emp, index) => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-100 hover:bg-gray-50/50';
+
+                tr.innerHTML = `
+                    <td class="px-4 py-3 font-semibold text-gray-500">${index + 1}</td>
+                    <td class="px-4 py-3">
+                        <input type="text" value="${emp.name}" onchange="updateEmployeeName(${emp.id}, this.value)" 
+                            class="w-full px-3 py-1.5 border border-gray-200 rounded-lg text-sm font-semibold text-gray-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <input type="number" min="0" max="100" value="${emp.scores[0]}" onchange="updateEmployeeScore(${emp.id}, 0, this.value)"
+                            class="w-20 mx-auto px-2 py-1 text-center border border-gray-200 rounded-lg text-sm font-mono font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <input type="number" min="0" max="100" value="${emp.scores[1]}" onchange="updateEmployeeScore(${emp.id}, 1, this.value)"
+                            class="w-20 mx-auto px-2 py-1 text-center border border-gray-200 rounded-lg text-sm font-mono font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <input type="number" min="0" max="100" value="${emp.scores[2]}" onchange="updateEmployeeScore(${emp.id}, 2, this.value)"
+                            class="w-20 mx-auto px-2 py-1 text-center border border-gray-200 rounded-lg text-sm font-mono font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <input type="number" min="0" max="100" value="${emp.scores[3]}" onchange="updateEmployeeScore(${emp.id}, 3, this.value)"
+                            class="w-20 mx-auto px-2 py-1 text-center border border-gray-200 rounded-lg text-sm font-mono font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <button onclick="removeEmployee(${emp.id})" class="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition" title="Hapus Karyawan">
+                            🗑️
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Add New Employee
+        function addNewEmployee() {
+            const newId = Date.now();
+            employees.push({
+                id: newId,
+                name: `Karyawan ${employees.length + 1}`,
+                scores: [80, 80, 80, 80]
+            });
+            renderManualInputTable();
+            calculateAHP();
+        }
+
+        // Remove Employee
+        function removeEmployee(id) {
+            if (employees.length <= 1) {
+                alert('Minimal harus ada 1 karyawan.');
+                return;
+            }
+            employees = employees.filter(e => e.id !== id);
+            renderManualInputTable();
+            calculateAHP();
+        }
+
+        // Update Score Handler
+        function updateEmployeeScore(id, cIndex, val) {
+            const emp = employees.find(e => e.id === id);
+            if (emp) {
+                emp.scores[cIndex] = Math.min(100, Math.max(0, parseFloat(val) || 0));
+                calculateAHP();
+            }
+        }
+
+        // Update Name Handler
+        function updateEmployeeName(id, val) {
+            const emp = employees.find(e => e.id === id);
+            if (emp) {
+                emp.name = val.trim() || 'Tanpa Nama';
+                calculateAHP();
+            }
+        }
+
+        // Fill Random Scores
+        function fillRandomScores() {
+            employees.forEach(emp => {
+                emp.scores = emp.scores.map(() => Math.floor(Math.random() * 30) + 70);
+            });
+            renderManualInputTable();
+            calculateAHP();
+        }
+
+        // Pairwise Slider Sync
+        function updateMatrixFromSliders() {
+            ['k1-k2', 'k1-k3', 'k1-k4', 'k2-k3', 'k2-k4', 'k3-k4'].forEach(pair => {
+                const val = document.getElementById(`slider-${pair}`).value;
+                document.getElementById(`val-${pair}`).innerText = val;
+            });
+            calculateAHP();
+        }
+
+        // Core AHP Calculation Engine (4 Kriteria)
+        function calculateAHP() {
+            const v12 = parseFloat(document.getElementById('slider-k1-k2').value);
+            const v13 = parseFloat(document.getElementById('slider-k1-k3').value);
+            const v14 = parseFloat(document.getElementById('slider-k1-k4').value);
+            const v23 = parseFloat(document.getElementById('slider-k2-k3').value);
+            const v24 = parseFloat(document.getElementById('slider-k2-k4').value);
+            const v34 = parseFloat(document.getElementById('slider-k3-k4').value);
+
+            // Construct 4x4 Pairwise Matrix
+            const matrix = [
+                [1, v12, v13, v14],
+                [1/v12, 1, v23, v24],
+                [1/v13, 1/v23, 1, v34],
+                [1/v14, 1/v24, 1/v34, 1]
+            ];
+
+            // 1. Column Sums
+            const colSums = [0, 0, 0, 0];
+            for (let c = 0; c < 4; c++) {
+                for (let r = 0; r < 4; r++) {
+                    colSums[c] += matrix[r][c];
+                }
+            }
+
+            // 2. Normalized Vector & Eigenvector Weights
+            const weights = [0, 0, 0, 0];
+            for (let r = 0; r < 4; r++) {
+                let rowSumNorm = 0;
+                for (let c = 0; c < 4; c++) {
+                    rowSumNorm += matrix[r][c] / colSums[c];
+                }
+                weights[r] = rowSumNorm / 4;
+            }
+
+            // 3. Consistency Ratio (CR)
+            let lambdaMax = 0;
+            for (let c = 0; c < 4; c++) {
+                lambdaMax += colSums[c] * weights[c];
+            }
+            const n = 4;
+            const CI = (lambdaMax - n) / (n - 1);
+            const CR = CI / RI_TABLE[n];
+
+            // 4. Calculate Weighted Composite Score for All Employees
+            const results = employees.map(emp => {
+                let finalScore = 0;
+                for (let i = 0; i < 4; i++) {
+                    finalScore += emp.scores[i] * weights[i];
+                }
+                return {
+                    ...emp,
+                    finalScore: finalScore
+                };
+            });
+
+            // Sort Ranking
+            results.sort((a, b) => b.finalScore - a.finalScore);
+
+            // Update UI
+            updateDashboardUI(weights, CR, results);
+        }
+
+        // Update Dashboard UI
+        function updateDashboardUI(weights, CR, results) {
+            // CR KPI
+            const crPercent = (CR * 100).toFixed(1);
+            document.getElementById('kpi-cr-val').innerText = `${CR.toFixed(3)} (${crPercent}%)`;
+            const crBadge = document.getElementById('kpi-cr-badge');
+            
+            if (CR <= 0.1) {
+                crBadge.innerText = 'Valid (CR ≤ 10%)';
+                crBadge.className = 'inline-block px-2 py-0.5 text-[10px] bg-emerald-100 text-emerald-800 rounded-md font-semibold';
+            } else {
+                crBadge.innerText = 'Tidak Konsisten (> 10%)';
+                crBadge.className = 'inline-block px-2 py-0.5 text-[10px] bg-rose-100 text-rose-800 rounded-md font-semibold';
+            }
+
+            // Top Employee
+            const winner = results[0];
+            document.getElementById('kpi-best-employee').innerText = winner.name;
+            document.getElementById('kpi-best-score').innerText = `Skor Akhir: ${winner.finalScore.toFixed(1)}`;
+            document.getElementById('kpi-total-candidates').innerText = `${results.length} Personel`;
+
+            // Dominant Criteria
+            let maxWeightIdx = 0;
+            for (let i = 1; i < weights.length; i++) {
+                if (weights[i] > weights[maxWeightIdx]) maxWeightIdx = i;
+            }
+            document.getElementById('kpi-dominant-criteria').innerText = criteriaNames[maxWeightIdx].split(' ')[0];
+            document.getElementById('kpi-dominant-weight').innerText = `Bobot: ${(weights[maxWeightIdx] * 100).toFixed(1)}%`;
+
+            // Criteria Weight Table Output
+            const criteriaTbody = document.getElementById('criteria-weight-table-body');
+            criteriaTbody.innerHTML = '';
+            criteriaNames.forEach((name, i) => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-100';
+                tr.innerHTML = `
+                    <td class="px-4 py-2 font-bold text-indigo-600">K${i+1}</td>
+                    <td class="px-4 py-2 font-medium">${name}</td>
+                    <td class="px-4 py-2 text-right font-mono">${weights[i].toFixed(3)}</td>
+                    <td class="px-4 py-2 text-right font-bold text-gray-800">${(weights[i] * 100).toFixed(1)}%</td>
+                `;
+                criteriaTbody.appendChild(tr);
+            });
+
+            // Ranking Table Output
+            const tbody = document.getElementById('ranking-table-body');
+            tbody.innerHTML = '';
+            results.forEach((emp, index) => {
+                const rank = index + 1;
+                const isWinner = rank === 1;
+                
+                const tr = document.createElement('tr');
+                tr.className = isWinner ? 'bg-emerald-50/50 border-b border-gray-100' : 'border-b border-gray-100 hover:bg-gray-50';
+
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-bold ${isWinner ? 'text-emerald-600' : 'text-gray-500'}">
+                        #${rank}
+                    </td>
+                    <td class="px-6 py-4 font-semibold text-gray-900">
+                        ${emp.name}
+                    </td>
+                    <td class="px-6 py-4 text-center font-mono text-xs">${emp.scores[0]}</td>
+                    <td class="px-6 py-4 text-center font-mono text-xs">${emp.scores[1]}</td>
+                    <td class="px-6 py-4 text-center font-mono text-xs">${emp.scores[2]}</td>
+                    <td class="px-6 py-4 text-center font-mono text-xs">${emp.scores[3]}</td>
+                    <td class="px-6 py-4 text-right font-mono font-bold text-gray-900">${emp.finalScore.toFixed(2)}</td>
+                    <td class="px-6 py-4 text-center">
+                        ${isWinner 
+                            ? '<span class="px-3 py-1 text-xs bg-emerald-100 text-emerald-800 rounded-full font-semibold">🏆 Terbaik 1</span>'
+                            : (rank <= 3 
+                                ? `<span class="px-3 py-1 text-xs bg-indigo-50 text-indigo-700 rounded-full font-medium">Top ${rank}</span>`
+                                : '<span class="px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full font-medium">Kandidat</span>')
+                        }
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Update Charts
+            updateCharts(results, weights);
+        }
+
+        // Initialize Chart.js
+        function initCharts() {
+            const ctxRanking = document.getElementById('rankingChart').getContext('2d');
+            rankingChartInstance = new Chart(ctxRanking, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Skor Akhir AHP',
+                        data: [],
+                        backgroundColor: function(context) {
+                            return context.dataIndex === 0 ? '#10B981' : '#6366F1';
+                        },
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, max: 100 }
+                    }
+                }
+            });
+
+            const ctxWeight = document.getElementById('weightChart').getContext('2d');
+            weightChartInstance = new Chart(ctxWeight, {
+                type: 'doughnut',
+                data: {
+                    labels: criteriaNames,
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['#4F46E5', '#06B6D4', '#F59E0B', '#EC4899']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        // Update Charts
+        function updateCharts(results, weights) {
+            if (rankingChartInstance && weightChartInstance) {
+                rankingChartInstance.data.labels = results.slice(0, 12).map(r => r.name);
+                rankingChartInstance.data.datasets[0].data = results.slice(0, 12).map(r => r.finalScore);
+                rankingChartInstance.update();
+
+                weightChartInstance.data.datasets[0].data = weights.map(w => (w * 100).toFixed(1));
+                weightChartInstance.update();
+            }
+        }
+
+        function resetData() {
+            document.getElementById('slider-k1-k2').value = 3;
+            document.getElementById('slider-k1-k3').value = 5;
+            document.getElementById('slider-k1-k4').value = 4;
+            document.getElementById('slider-k2-k3').value = 3;
+            document.getElementById('slider-k2-k4').value = 2;
+            document.getElementById('slider-k3-k4').value = 1;
+            updateMatrixFromSliders();
+        }
+    </script>
+</body>
+</html>
